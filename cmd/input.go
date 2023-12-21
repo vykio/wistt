@@ -10,28 +10,31 @@ import (
 	"strings"
 )
 
-func GetOutput() (string, error) {
+// GetIO No input can be extracted when ran using pipe
+func GetIO() (string, string, error) {
+	var input string
 	var output string
 
 	if len(os.Args) > 1 && os.Args[1] == "--" {
 		cmdArgs := os.Args[2:]
+		input = strings.Join(cmdArgs, " ")
 
 		if len(cmdArgs) == 0 {
-			return "", errors.New("please provide a command")
+			return "", "", errors.New("please provide a command")
 		}
 
 		cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
 		outputBytes, err := cmd.CombinedOutput()
 
 		if err != nil {
-			return "", errors.New(fmt.Sprintf("an error occured while executing the provided command : %s", err))
+			return input, "", errors.New(fmt.Sprintf("an error occured while executing the provided command : %s", err))
 		}
 
 		output = string(outputBytes)
 	} else {
 		stdin, err := readCommandFromStdin()
 		if err != nil {
-			return "", err
+			return "", "", err
 		}
 
 		output = strings.Join(stdin, "\n")
@@ -39,7 +42,7 @@ func GetOutput() (string, error) {
 
 	log.Print(output)
 
-	return output, nil
+	return input, output, nil
 }
 
 func readCommandFromStdin() ([]string, error) {

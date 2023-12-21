@@ -10,12 +10,12 @@ import (
 )
 
 func main() {
-	output, err := cmd.GetOutput()
+	input, output, err := cmd.GetIO()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	b, err := image.GenerateBuffer(image.Image{Output: output})
+	b, err := image.GenerateBuffer(image.Image{Input: input, Output: output})
 	if err != nil {
 		log.Fatal(err)
 	}

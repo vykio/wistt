@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"embed"
+	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 	"html/template"
 	"time"
@@ -13,6 +14,7 @@ import (
 var content embed.FS
 
 type Image struct {
+	Input  string
 	Output string
 }
 
@@ -41,9 +43,16 @@ func GenerateBuffer(image Image) ([]byte, error) {
 	}
 
 	if err := chromedp.Run(ctx,
-		chromedp.Navigate("data:text/html,"+b.String()),
+		chromedp.Navigate("about:blank"),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			frameTree, err := page.GetFrameTree().Do(ctx)
+			if err != nil {
+				return err
+			}
+			return page.SetDocumentContent(frameTree.Frame.ID, b.String()).Do(ctx)
+		}),
 		chromedp.WaitReady("pre"),
-		chromedp.Screenshot("#output", &buf),
+		chromedp.Screenshot("#container", &buf),
 	); err != nil {
 		return nil, err
 	}
