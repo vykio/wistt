@@ -1,7 +1,8 @@
 # Requirements
 
 ## Linux
-`xclip`
+- `xclip`
+- `chrome` or `chromium`
 
 # Usage
 
